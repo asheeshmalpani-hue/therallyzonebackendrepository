@@ -122,7 +122,7 @@ app.put('/api/attendance/:id', async (req, res) => {
 // New endpoint: fetch only closed tournaments
 //app.get('/api/tournaments/closed', async (req, res) => {
 //  try {
-//    const [rows] = await pool.execute("SELECT id, name, category, Age_criteria, Location, status, date, fee FROM tournaments WHERE status = 'Closed'");
+//    const [rows] = await pool.execute("SELECT id, name, category, Age_criteria, location, status, date, fee FROM tournaments WHERE status = 'Closed'");
 //    res.json(rows);
 //  } catch (error) {
 //    console.error('Error fetching closed tournaments:', error.message);
@@ -134,7 +134,7 @@ app.get('/api/tournaments/closed', async (req, res) => {
   try {
     const { data: rows, error } = await supabase
       .from('tournaments')
-      .select('id, name, category, Age_criteria, Location, status, date, fee')
+      .select('id, name, category, Age_criteria, location, status, date, fee')
       .eq('status', 'Closed')
       .eq('category', 'Ladder');
     if (error) throw error;
@@ -142,7 +142,7 @@ app.get('/api/tournaments/closed', async (req, res) => {
     const results = [];
     for (const t of (rows || [])) {
       const { data: drawRows, error: drawErr } = await supabase
-        .from('Team_Design')
+        .from('Team_design')
         .select('id')
         .eq('tournament_id', t.id)
         .limit(1);
@@ -210,7 +210,7 @@ app.get('/api/reports/monthly-player-performance', async (req, res) => {
 
     const teamIds = [...new Set((events || []).map(event => event.team_id).filter(Boolean))];
     const { data: teams, error: teamErr } = await supabase
-      .from('Team_Design')
+      .from('Team_design')
       .select('id, tournament_id')
       .in('id', teamIds);
     if (teamErr) throw teamErr;
@@ -343,7 +343,7 @@ app.post('/api/admin/add-tournament-with-events-draws', async (req, res) => {
 
     for (const team of teams) {
       const { data: teamRow, error: teamErr } = await supabase
-        .from('Team_Design')
+        .from('Team_design')
         .insert([{ tournament_id: tournamentId, team_name: team.team_name }])
         .select('id')
         .single();
@@ -446,7 +446,7 @@ app.get('/api/user-matches/:userName', async (req, res) => {
 
     const teamIds = [...new Set((events || []).map(event => event.team_id).filter(Boolean))];
     const { data: teams, error: teamsErr } = await supabase
-      .from('Team_Design')
+      .from('Team_design')
       .select('id, team_name, tournament_id')
       .in('id', teamIds);
     if (teamsErr) throw teamsErr;
@@ -454,7 +454,7 @@ app.get('/api/user-matches/:userName', async (req, res) => {
     const tournamentIds = [...new Set((teams || []).map(team => team.tournament_id).filter(Boolean))];
     const { data: tournaments, error: tournamentsErr } = await supabase
       .from('tournaments')
-      .select('id, name, category, Location')
+      .select('id, name, category, location')
       .in('id', tournamentIds);
     if (tournamentsErr) throw tournamentsErr;
 
@@ -474,7 +474,7 @@ app.get('/api/user-matches/:userName', async (req, res) => {
         match_date: match.match_date ? new Date(match.match_date).toISOString().slice(0, 10) : null,
         tournament_name: tournament.name || null,
         tournament_category: tournament.category || null,
-        tournament_location: tournament.Location || null,
+        tournament_location: tournament.location || null,
         team_name: team.team_name || null,
         event_name: event.event_name || null,
         draw_name: draw.draw_name || null
@@ -494,7 +494,7 @@ app.get('/api/tournaments', async (req, res) => {
   try {
     const { data: tournaments, error } = await supabase
       .from('tournaments')
-      .select('id, name, category, Age_criteria, Location, status, date, fee')
+      .select('id, name, category, Age_criteria, location, status, date, fee')
       .in('status', ['Open', 'Started']);
 
     if (error) throw error;
@@ -506,7 +506,7 @@ app.get('/api/tournaments', async (req, res) => {
       let draw_id = null;
       let draw_name = null;
 
-      const { data: teamDesigns, error: tdErr } = await supabase.from('Team_Design').select('id').eq('tournament_id', t.id).limit(1);
+      const { data: teamDesigns, error: tdErr } = await supabase.from('Team_design').select('id').eq('tournament_id', t.id).limit(1);
       if (tdErr) throw tdErr;
       if (teamDesigns && teamDesigns.length > 0) {
         const teamId = teamDesigns[0].id;
@@ -968,7 +968,7 @@ app.get('/api/tournament-event-name/:tournamentId', async (req, res) => {
   try {
     const { tournamentId } = req.params;
     const { data: teamRows, error: teamErr } = await supabase
-      .from('Team_Design')
+      .from('Team_design')
       .select('id')
       .eq('tournament_id', tournamentId)
       .limit(1);
