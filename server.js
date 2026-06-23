@@ -596,10 +596,11 @@ app.post('/api/attendance', async (req, res) => {
   }
   try {
     // Prevent duplicate In attendance
+    // changed for supabase in this line .or(`(in_user.eq.${in_user},in_partner.eq.${in_user})`) to remove exra bracket
     const { data: existingRows, error: existErr } = await supabase
       .from('attendance')
       .select('*')
-      .or(`(in_user.eq.${in_user},in_partner.eq.${in_user})`)
+      .or(`in_user.eq.${in_user},in_partner.eq.${in_user}`)
       .eq('tournament_name', tournamentName)
       .eq('draw_id', draw_id);
     if (existErr) throw existErr;
