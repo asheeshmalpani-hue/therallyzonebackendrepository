@@ -865,6 +865,7 @@ app.put('/api/tournaments/:tournamentId/status', async (req, res) => {
   }
 });
 // PUT /api/match-draw/:matchId/result
+//added code for supabse compatibility by asheesh on 25june2026
 app.put('/api/match-draw/:matchId/result', async (req, res) => {
   try {
     const { matchId } = req.params;
@@ -874,9 +875,16 @@ app.put('/api/match-draw/:matchId/result', async (req, res) => {
     }
 
     const { data: updatedMatch, error: updateErr } = await supabase
-      .from('match_draws')
-      .update({ winner, winner_p: winner_p || '', match_score: match_score || '', match_status: 'completed', updated_at: new Date().toISOString() })
-      .eq('id', matchId);
+  .from('match_draws')
+  .update({
+    winner,
+    winner_p: winner_p || '',
+    match_score: match_score || '',
+    match_status: 'completed',
+    updated_at: new Date().toISOString()
+  })
+  .eq('id', matchId)
+  .select();
     if (updateErr) throw updateErr;
     if (!updatedMatch || updatedMatch.length === 0) {
       return res.status(404).json({ message: 'Match not found' });
