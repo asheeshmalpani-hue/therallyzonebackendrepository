@@ -851,9 +851,10 @@ app.put('/api/tournaments/:tournamentId/status', async (req, res) => {
   }
   try {
     const { data, error } = await supabase
-      .from('tournaments')
-      .update({ status })
-      .eq('id', tournamentId);
+  .from('tournaments')
+  .update({ status })
+  .eq('id', tournamentId)
+  .select();
     if (error) throw error;
     if (!data || data.length === 0) {
       return res.status(404).json({ message: 'Tournament not found' });
@@ -865,7 +866,7 @@ app.put('/api/tournaments/:tournamentId/status', async (req, res) => {
   }
 });
 // PUT /api/match-draw/:matchId/result
-//added code for supabse compatibility by asheesh on 25june2026
+//added code(select();) for supabse compatibility by asheesh on 25june2026
 app.put('/api/match-draw/:matchId/result', async (req, res) => {
   try {
     const { matchId } = req.params;
