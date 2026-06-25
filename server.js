@@ -42,10 +42,6 @@ app.put('/api/match-draw/:matchId', async (req, res) => {
       .eq('id', matchId);
 
     if (error) throw error;
-    if (!data || data.length === 0) {
-      return res.status(404).json({ message: 'Match not found' });
-    }
-
     res.json({ message: 'Match updated successfully' });
   } catch (error) {
     console.error('Error updating match:', error.message || error);
@@ -95,7 +91,7 @@ app.put('/api/attendance/:id', async (req, res) => {
       out_user = null;
     }
 
-    const { data: updateData, error: updateErr } = await supabase
+    const { error: updateErr } = await supabase
       .from('attendance')
       .update({
         in_user: in_user || null,
@@ -108,10 +104,6 @@ app.put('/api/attendance/:id', async (req, res) => {
       .eq('id', id);
 
     if (updateErr) throw updateErr;
-    if (!updateData || updateData.length === 0) {
-      return res.status(404).json({ message: 'Attendance record not found' });
-    }
-
     res.json({ message: 'Attendance updated successfully' });
   } catch (error) {
     console.error('Error updating attendance:', error.message || error);
