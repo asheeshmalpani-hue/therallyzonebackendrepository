@@ -691,6 +691,44 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Admin Reset Password
+app.post('/api/users/:username/reset-password', async (req, res) => {
+  const { username } = req.params;
+  const { newPassword, user } = req.body;
+
+  if (!newPassword) {
+    return res.status(400).json({
+      message: 'New password is required'
+    });
+  }
+
+
+    const password_hash = await bcrypt.hash(newPassword, 10);
+
+    const { error } = await supabase
+      .from('users')
+      .update({ password_hash })
+      .eq('username', username);
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      message: 'Password reset successfully'
+    });
+
+  } catch (error) {
+    console.error(
+      'Password reset error:',
+      error.message || error
+    );
+
+    res.status(500).json({
+      message: 'Error resetting password'
+    });
+  }
+});
+
 // GET /api/user-rankings
 // POST /api/user-rankings
 app.post('/api/user-rankings', async (req, res) => {
