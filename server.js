@@ -696,12 +696,13 @@ app.post('/api/users/:username/reset-password', async (req, res) => {
   const { username } = req.params;
   const { newPassword, user } = req.body;
 
-  if (!newPassword) {
-    return res.status(400).json({
-      message: 'New password is required'
-    });
-  }
+  try {
 
+    if (!newPassword) {
+      return res.status(400).json({
+        message: 'New password is required'
+      });
+    }
 
     const password_hash = await bcrypt.hash(newPassword, 10);
 
@@ -728,7 +729,6 @@ app.post('/api/users/:username/reset-password', async (req, res) => {
     });
   }
 });
-
 // GET /api/user-rankings
 // POST /api/user-rankings
 app.post('/api/user-rankings', async (req, res) => {
